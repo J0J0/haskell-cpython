@@ -24,6 +24,14 @@ Flag usepython38
     for python 3.8)
   Default:     False
 
+flag usepythonembed
+  description:
+    Starting with python version 3.8, the correct pkg-config module name
+    for linking against libpython needs an additional "-embed" appended.
+    See https://docs.python.org/3/whatsnew/3.8.html#debug-build-uses-the-same-abi-as-release-build
+    for further information.
+  default: True
+
 
 source-repository head
   type: git
@@ -90,9 +98,16 @@ library
   include-dirs: cbits
 
   if flag(usepython38)
-    pkgconfig-depends: python-3.8
+    if flag(usepythonembed)
+      pkgconfig-depends: python-3.8-embed
+    else
+      pkgconfig-depends: python-3.8
   else
-    pkgconfig-depends: python3
+    if flag(usepythonembed)
+      pkgconfig-depends: python3-embed
+    else
+      pkgconfig-depends: python3
+
   default-language:    Haskell2010
 
 test-suite cpython-testsuite
@@ -106,8 +121,14 @@ test-suite cpython-testsuite
     , text
     , cpython
   if flag(usepython38)
-    extra-libraries: python3.8
-    pkgconfig-depends: python-3.8
+    if flag(usepythonembed)
+      pkgconfig-depends: python-3.8-embed
+    else
+      pkgconfig-depends: python-3.8
+      extra-libraries: python3.8
   else
-    pkgconfig-depends: python3
+    if flag(usepythonembed)
+      pkgconfig-depends: python3-embed
+    else
+      pkgconfig-depends: python3
   default-language:    Haskell2010
