@@ -25,6 +25,13 @@ flag usepythonembed
     for further information.
   default: True
 
+flag buildghcihack
+  description:
+    You may safely disable this if you don't want to use this package in GHCi or if your
+    platform does not provide "dlopen" functionality.
+    Otherwise look in the documentation of module CPython.GhciHack for more information.
+  default: True
+
 
 source-repository head
   type: git
@@ -83,6 +90,10 @@ library
     CPython.Simple
     CPython.Simple.Instances
     CPython.System
+
+  if flag(buildghcihack)
+    exposed-modules:
+      CPython.GhciHack
 
   other-modules:
     CPython.Internal
