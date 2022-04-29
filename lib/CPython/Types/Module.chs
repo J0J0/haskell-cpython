@@ -27,6 +27,7 @@ module CPython.Types.Module
   , addIntegerConstant
   , addTextConstant
   , importModule
+  , getModule
   , reload
   ) where
 
@@ -126,3 +127,13 @@ importModule name = do
 {# fun PyImport_ReloadModule as reload
   { withObject* `Module'
   } -> `Module' stealObject* #}
+
+-- | Retrieve a loaded module by name. If unsure whether the module needs to
+-- be imported first, use 'importModule'. If the module does not exist (e.g.,
+-- if it wasn't imported before) or the lookup fails, throws @SystemError@.
+getModule :: Text -> IO Module
+getModule name = do
+  pyName <- toUnicode name
+  withObject pyName $ \namePtr ->
+    {# call PyImport_GetModule as ^ #} namePtr
+    >>= stealObject
